@@ -1,0 +1,172 @@
+<div class="auth-bg">
+  <div class="auth-card">
+
+    <!-- Icono -->
+    <div class="auth-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+           fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <line x1="19" y1="8" x2="19" y2="14"/>
+        <line x1="22" y1="11" x2="16" y2="11"/>
+      </svg>
+    </div>
+
+    <h1 class="auth-title">Crear Cuenta</h1>
+    <p class="auth-subtitle">Únete a nuestra comunidad wellness</p>
+
+    @if (errorMsg()) {
+      <div class="error-banner">{{ errorMsg() }}</div>
+    }
+    @if (successMsg()) {
+      <div class="success-banner">{{ successMsg() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+      <!-- Nombre -->
+      <div class="field">
+        <label>Nombre Completo</label>
+        <div class="input-wrap" [class.invalid]="nombre?.invalid && nombre?.touched">
+          <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <input type="text" formControlName="nombre_completo" placeholder="Camila Heredia" autocomplete="name"/>
+        </div>
+        @if (nombre?.invalid && nombre?.touched) {
+          <span class="field-error">
+            @if (nombre?.errors?.['required']) { El nombre es obligatorio }
+            @if (nombre?.errors?.['minlength']) { Mínimo 3 caracteres }
+          </span>
+        }
+      </div>
+
+      <!-- Correo + Teléfono en fila -->
+      <div class="field-row">
+        <div class="field">
+          <label>Correo Electrónico</label>
+          <div class="input-wrap" [class.invalid]="email?.invalid && email?.touched">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+            </svg>
+            <input type="email" formControlName="correo_electronico" placeholder="tu@email.com" autocomplete="email"/>
+          </div>
+          @if (email?.invalid && email?.touched) {
+            <span class="field-error">
+              @if (email?.errors?.['required']) { El correo es obligatorio }
+              @if (email?.errors?.['email']) { Correo inválido }
+            </span>
+          }
+        </div>
+
+        <div class="field">
+          <label>Teléfono <span class="optional">(opcional)</span></label>
+          <div class="input-wrap">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.6a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.62 3h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.6a16 16 0 0 0 5.49 5.49l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            <input type="tel" formControlName="telefono" placeholder="+593 987654321" autocomplete="tel"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contraseñas en fila -->
+      <div class="field-row">
+        <div class="field">
+          <label>Contraseña</label>
+          <div class="input-wrap" [class.invalid]="password?.invalid && password?.touched">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <input [type]="showPassword() ? 'text' : 'password'"
+                   formControlName="contrasena"
+                   placeholder="••••••••"
+                   autocomplete="new-password"/>
+            <button type="button" class="toggle-pass" (click)="togglePassword()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2">
+                @if (showPassword()) {
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>
+                } @else {
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                }
+              </svg>
+            </button>
+          </div>
+          @if (password?.invalid && password?.touched) {
+            <span class="field-error">
+              @if (password?.errors?.['required']) { Obligatoria }
+              @if (password?.errors?.['minlength']) { Mínimo 8 caracteres }
+            </span>
+          }
+        </div>
+
+        <div class="field">
+          <label>Confirmar Contraseña</label>
+          <div class="input-wrap" [class.invalid]="confirm?.invalid && confirm?.touched">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <input [type]="showConfirmPassword() ? 'text' : 'password'"
+                   formControlName="contrasena_confirmation"
+                   placeholder="••••••••"
+                   autocomplete="new-password"/>
+            <button type="button" class="toggle-pass" (click)="toggleConfirmPassword()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          @if (confirm?.invalid && confirm?.touched) {
+            <span class="field-error">
+              @if (confirm?.errors?.['required']) { Obligatoria }
+              @if (confirm?.errors?.['mismatch']) { Las contraseñas no coinciden }
+            </span>
+          }
+        </div>
+      </div>
+
+      <!-- Hint contraseña -->
+      <div class="hint-box">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        La contraseña debe tener al menos 8 caracteres
+      </div>
+
+      <!-- Botón -->
+      <button type="submit" class="btn-primary" [disabled]="loading()">
+        @if (loading()) {
+          <span class="spinner"></span> Creando cuenta...
+        } @else {
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+               fill="none" stroke="white" stroke-width="2.5">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <line x1="19" y1="8" x2="19" y2="14"/>
+            <line x1="22" y1="11" x2="16" y2="11"/>
+          </svg>
+          Crear Cuenta
+        }
+      </button>
+
+    </form>
+
+    <p class="auth-footer">
+      ¿Ya tienes cuenta?
+      <a routerLink="/auth/login" class="link-login">Inicia sesión aquí</a>
+    </p>
+
+  </div>
+</div>

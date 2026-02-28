@@ -1,0 +1,66 @@
+<app-navbar />
+
+<main class="dashboard">
+  <div class="dashboard-inner">
+
+    <div class="dashboard-header">
+      <h1>Sistema de Navegación Wellness</h1>
+      <p>Este es un sistema completo de navegación para aplicaciones de wellness, diseñado con
+         colores naturales, microinteracciones suaves y accesibilidad completa.</p>
+    </div>
+
+    <div class="cards-grid">
+      @for (card of cards; track card.path) {
+        <a [routerLink]="card.path" class="card">
+          <div class="card-icon" [style.background]="card.bgColor">
+            <!-- Retiros -->
+            @if (card.icon === 'retiros') {
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+                   fill="none" [attr.stroke]="card.iconColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
+            }
+            <!-- Capacitaciones -->
+            @if (card.icon === 'capacitaciones') {
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+                   fill="none" [attr.stroke]="card.iconColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.35-4.35"/>
+              </svg>
+            }
+            <!-- Productos -->
+            @if (card.icon === 'productos') {
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+                   fill="none" [attr.stroke]="card.iconColor" stroke-width="2">
+                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+              </svg>
+            }
+            <!-- Blog -->
+            @if (card.icon === 'blog') {
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+                   fill="none" [attr.stroke]="card.iconColor" stroke-width="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+            }
+            <!-- Perfil -->
+            @if (card.icon === 'perfil') {
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+                   fill="none" [attr.stroke]="card.iconColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            }
+          </div>
+          <div class="card-body">
+            <h3>{{ card.title }}</h3>
+            <p>{{ card.description }}</p>
+          </div>
+        </a>
+      }
+    </div>
+
+  </div>
+</main>
