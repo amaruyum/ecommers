@@ -25,7 +25,7 @@ class UsuarioSeeder extends Seeder
             'estado_cuenta'      => 'activo',
             'fecha_registro'     => now()->subDays(60),
             'fecha_modificacion' => now(),
-        ]);
+        ], 'id_usuario');
         DB::table('usuario_administrador')->insert(['id_usuario' => $adminId]);
 
         // ── 2. Instructores ───────────────────────────────────
@@ -69,7 +69,7 @@ class UsuarioSeeder extends Seeder
                 'estado_cuenta'      => 'activo',
                 'fecha_registro'     => now()->subDays(rand(30, 90)),
                 'fecha_modificacion' => now(),
-            ]);
+            ], 'id_usuario');
             DB::table('usuario_instructor')->insert([
                 'id_usuario'      => $id,
                 'especialidad'    => $data['especialidad'],
@@ -98,7 +98,7 @@ class UsuarioSeeder extends Seeder
                 'estado_cuenta'      => 'activo',
                 'fecha_registro'     => now()->subDays(rand(1, 120)),
                 'fecha_modificacion' => now(),
-            ]);
+            ], 'id_usuario');
             DB::table('usuario_cliente')->insert([
                 'id_usuario'   => $id,
                 'ciudad'       => $c['ciudad'],

@@ -339,7 +339,7 @@ class ItemSeeder extends Seeder
 
         // Insertar servicios
         foreach ($servicios as $data) {
-            $itemId = DB::table('item')->insertGetId($data['item']);
+            $itemId = DB::table('item')->insertGetId($data['item'], 'id_item');
             DB::table('item_servicio')->insert(array_merge(
                 $data['servicio'],
                 ['id_item' => $itemId]
@@ -352,7 +352,7 @@ class ItemSeeder extends Seeder
             if ($data['producto']['stock_disponible'] === 0) {
                 $data['item']['estado'] = 'agotado';
             }
-            $itemId = DB::table('item')->insertGetId($data['item']);
+            $itemId = DB::table('item')->insertGetId($data['item'], 'id_item');
             DB::table('item_producto')->insert(array_merge(
                 $data['producto'],
                 ['id_item' => $itemId]
