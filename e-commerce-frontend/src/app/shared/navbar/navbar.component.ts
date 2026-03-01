@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
+import { NotificacionesComponent } from '../notificaciones/notificaciones.component';
 import { ItemService } from '../../features/catalogo/services/item.service';
 import { ContenidoService } from '../../features/contenido/services/contenido.service';
 import { Item } from '../../features/catalogo/models/item.model';
@@ -25,7 +26,7 @@ export interface SearchResult {
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, CartDrawerComponent],
+  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, CartDrawerComponent, NotificacionesComponent],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
