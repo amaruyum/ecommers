@@ -7,11 +7,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Contenido extends Model
 {
-    protected $table = 'CONTENIDO';
+    protected $table      = 'contenido';
     protected $primaryKey = 'id_contenido';
-    public $timestamps = false;
+    public    $timestamps  = false;
 
-    protected $fillable = ['id_administrador', 'titulo', 'cuerpo', 'tipo_contenido'];
+    protected $fillable = [
+        'id_administrador',
+        'titulo',
+        'cuerpo',
+        'fecha_creacion',
+        'tipo_contenido',
+    ];
 
     protected $casts = [
         'fecha_creacion' => 'datetime',
@@ -19,6 +25,6 @@ class Contenido extends Model
 
     public function administrador(): BelongsTo
     {
-        return $this->belongsTo(UsuarioAdministrador::class, 'id_administrador');
+        return $this->belongsTo(UsuarioAdministrador::class, 'id_administrador', 'id_administrador');
     }
 }

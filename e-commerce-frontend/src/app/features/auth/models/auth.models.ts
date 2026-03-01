@@ -15,7 +15,9 @@ export interface Usuario {
   id_usuario: number;
   nombre_completo: string;
   correo_electronico: string;
+  telefono?: string;
   estado_cuenta: string;
+  is_admin: boolean;
 }
 
 export interface AuthResponse {

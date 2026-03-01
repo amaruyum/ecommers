@@ -1,0 +1,101 @@
+<!-- Overlay -->
+@if (cart.drawerOpen()) {
+  <div class="drawer-overlay" (click)="cart.cerrarDrawer()"></div>
+
+  <div class="drawer">
+
+    <!-- Header -->
+    <div class="drawer-header">
+      <div class="header-left">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        <h2>Mi Carrito</h2>
+        @if (!cart.estaVacio()) {
+          <span class="header-badge">{{ cart.totalItems() }}</span>
+        }
+      </div>
+      <button class="close-btn" (click)="cart.cerrarDrawer()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Items -->
+    <div class="drawer-body">
+
+      @if (cart.estaVacio()) {
+        <div class="empty-cart">
+          <div class="empty-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+                 fill="none" stroke="#C8BFB0" stroke-width="1.5">
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+          </div>
+          <p class="empty-title">Tu carrito está vacío</p>
+          <p class="empty-sub">Agrega productos desde nuestra tienda</p>
+          <button class="btn-explorar" (click)="cart.cerrarDrawer()">
+            Explorar productos →
+          </button>
+        </div>
+      } @else {
+
+        <ul class="cart-list">
+          @for (ci of cart.items(); track ci.item.id_item) {
+            <li class="cart-item">
+              <div class="item-img">
+                <img [src]="getImagen(ci)" [alt]="ci.item.nombre"/>
+              </div>
+              <div class="item-body">
+                <span class="item-nombre">{{ ci.item.nombre }}</span>
+                @if (ci.item.producto?.marca) {
+                  <span class="item-marca">{{ ci.item.producto?.marca }}</span>
+                }
+                <div class="item-bottom">
+                  <div class="cantidad-ctrl">
+                    <button (click)="decrementar(ci)">−</button>
+                    <span>{{ ci.cantidad }}</span>
+                    <button (click)="incrementar(ci)">+</button>
+                  </div>
+                  <span class="item-precio">${{ (ci.item.precio * ci.cantidad) | number:'1.2-2' }}</span>
+                </div>
+              </div>
+              <button class="quitar-btn" (click)="quitar(ci)" title="Eliminar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                  <path d="M10 11v6M14 11v6"/>
+                </svg>
+              </button>
+            </li>
+          }
+        </ul>
+
+      }
+    </div>
+
+    <!-- Footer -->
+    @if (!cart.estaVacio()) {
+      <div class="drawer-footer">
+        <div class="subtotal-row">
+          <span>Subtotal ({{ cart.totalItems() }} item{{ cart.totalItems() !== 1 ? 's' : '' }})</span>
+          <strong>${{ cart.subtotal() | number:'1.2-2' }}</strong>
+        </div>
+        <p class="envio-nota">🚚 Envío calculado en el checkout</p>
+        <button class="btn-checkout" (click)="irCheckout()">
+          Ir al Checkout →
+        </button>
+        <button class="btn-vaciar" (click)="cart.vaciar()">
+          Vaciar carrito
+        </button>
+      </div>
+    }
+
+  </div>
+}

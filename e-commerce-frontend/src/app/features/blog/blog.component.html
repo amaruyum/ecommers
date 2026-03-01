@@ -1,0 +1,131 @@
+<app-navbar />
+
+<main class="blog-page">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <span class="hero-tag">Nuestro Blog</span>
+      <h1>Bienestar, Sabiduría & Transformación</h1>
+      <p>Artículos, noticias y recursos para apoyar tu camino hacia el bienestar integral.</p>
+    </div>
+  </section>
+
+  <div class="page-inner">
+
+    <!-- ── VIDEO DESTACADO ────────────────────────────────── -->
+    <section class="video-section">
+      <div class="video-label">
+        <span class="pulse-dot"></span>
+        Video Destacado
+      </div>
+      <h2>Descubre el Poder del Bienestar Integral</h2>
+      <p class="video-desc">
+        Una introducción a nuestra filosofía de bienestar: mente, cuerpo y espíritu en armonía.
+        Un viaje de transformación que comienza con un primer paso.
+      </p>
+      <div class="video-wrap">
+        <iframe
+          [src]="videoUrl"
+          title="Video Bienestar Integral"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </section>
+
+    <!-- ── FILTROS ─────────────────────────────────────────── -->
+    <div class="filtros-row">
+      @for (f of tiposFiltro; track f.value) {
+        <button class="filtro-btn"
+                [class.active]="filterTipo() === f.value"
+                (click)="onFilterTipo(f.value)">
+          {{ f.label }}
+        </button>
+      }
+    </div>
+
+    @if (errorMsg()) {
+      <div class="alert-error">{{ errorMsg() }}</div>
+    }
+
+    @if (loading()) {
+      <div class="loading-state">
+        <span class="spinner"></span>
+        <p>Cargando artículos...</p>
+      </div>
+    }
+
+    @if (!loading()) {
+
+      @if (articulos().length === 0) {
+        <div class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+               fill="none" stroke="#C8BFB0" stroke-width="1.5">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <p>No hay contenido publicado aún.</p>
+        </div>
+      } @else {
+
+        <!-- ── ARTÍCULO PRINCIPAL (primero) ───────────────── -->
+        @if (articulos().length > 0) {
+          <div class="articulo-principal">
+            <div class="ap-img">
+              <img [src]="getImagen(articulos()[0])" [alt]="articulos()[0].titulo"/>
+              <span class="ap-badge" [class]="'tipo-' + articulos()[0].tipo_contenido">
+                {{ getTipoLabel(articulos()[0].tipo_contenido) }}
+              </span>
+            </div>
+            <div class="ap-body">
+              <span class="ap-fecha">{{ formatFecha(articulos()[0].fecha_creacion) }}</span>
+              <h2 class="ap-titulo">{{ articulos()[0].titulo }}</h2>
+              <p class="ap-cuerpo" [class.expanded]="isExpanded(articulos()[0].id_contenido)">
+                {{ isExpanded(articulos()[0].id_contenido)
+                    ? articulos()[0].cuerpo
+                    : getResumen(articulos()[0].cuerpo) }}
+              </p>
+              <button class="btn-leer" (click)="toggleExpand(articulos()[0].id_contenido)">
+                {{ isExpanded(articulos()[0].id_contenido) ? 'Leer menos ↑' : 'Leer más →' }}
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- ── GRID DE ARTÍCULOS ───────────────────────────── -->
+        @if (articulos().length > 1) {
+          <div class="seccion-title">Más artículos</div>
+          <div class="articulos-grid">
+            @for (art of articulos().slice(1); track art.id_contenido) {
+              <div class="card-art">
+                <div class="card-img">
+                  <img [src]="getImagen(art)" [alt]="art.titulo" loading="lazy"/>
+                  <span class="card-badge" [class]="'tipo-' + art.tipo_contenido">
+                    {{ getTipoLabel(art.tipo_contenido) }}
+                  </span>
+                </div>
+                <div class="card-body">
+                  <span class="card-fecha">{{ formatFecha(art.fecha_creacion) }}</span>
+                  <h3 class="card-titulo">{{ art.titulo }}</h3>
+                  <p class="card-resumen">{{ getResumen(art.cuerpo) }}</p>
+                  <button class="btn-leer-sm" (click)="toggleExpand(art.id_contenido)">
+                    {{ isExpanded(art.id_contenido) ? 'Cerrar ↑' : 'Leer más →' }}
+                  </button>
+                  @if (isExpanded(art.id_contenido)) {
+                    <div class="card-expandido">
+                      <p>{{ art.cuerpo }}</p>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+      }
+    }
+  </div>
+</main>

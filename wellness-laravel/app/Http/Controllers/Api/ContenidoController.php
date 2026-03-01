@@ -9,45 +9,87 @@ use Illuminate\Http\Request;
 
 class ContenidoController extends Controller
 {
-    public function index(): JsonResponse { return response()->json(Contenido::all()); }
+    /**
+     * GET /api/contenido
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $query = Contenido::query();
 
+        if ($request->filled('tipo_contenido')) {
+            $query->where('tipo_contenido', $request->tipo_contenido);
+        }
+
+        if ($request->filled('search')) {
+            $query->where('titulo', 'ilike', '%' . $request->search . '%');
+        }
+
+        $contenidos = $query->orderByDesc('fecha_creacion')->get();
+
+        return response()->json([
+            'data'  => $contenidos,
+            'total' => $contenidos->count(),
+        ]);
+    }
+
+    /**
+     * POST /api/contenido
+     */
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'id_administrador' => 'required|exists:USUARIO_ADMINISTRADOR,id_usuario',
-            'titulo' => 'required|string|max:255',
-            'cuerpo' => 'nullable|string|max:255',
-            'tipo_contenido' => 'nullable|string|max:100',
+            'titulo'          => 'required|string',
+            'cuerpo'          => 'required|string',
+            'tipo_contenido'  => 'required|in:articulo,noticia,video,anuncio',
         ]);
-        $c = Contenido::create($validated);
-        return response()->json($c, 201);
+
+        $validated['id_administrador'] = auth()->id();
+        $validated['fecha_creacion']   = now();
+
+        $contenido = Contenido::create($validated);
+
+        return response()->json([
+            'message'   => 'Contenido creado correctamente',
+            'contenido' => $contenido,
+        ], 201);
     }
 
-    public function show(string $id): JsonResponse
+    /**
+     * GET /api/contenido/{id}
+     */
+    public function show(int $id): JsonResponse
     {
-        $c = Contenido::find($id);
-        if (!$c) return response()->json(['error' => 'No encontrado'], 404);
-        return response()->json($c);
+        $contenido = Contenido::findOrFail($id);
+        return response()->json($contenido);
     }
 
-    public function update(Request $request, string $id): JsonResponse
+    /**
+     * PUT /api/contenido/{id}
+     */
+    public function update(Request $request, int $id): JsonResponse
     {
-        $c = Contenido::find($id);
-        if (!$c) return response()->json(['error' => 'No encontrado'], 404);
-        $c->update($request->validate([
-            'id_administrador' => 'sometimes|exists:USUARIO_ADMINISTRADOR,id_usuario',
-            'titulo' => 'sometimes|string|max:255',
-            'cuerpo' => 'nullable|string|max:255',
-            'tipo_contenido' => 'nullable|string|max:100',
-        ]));
-        return response()->json($c);
+        $contenido = Contenido::findOrFail($id);
+
+        $validated = $request->validate([
+            'titulo'         => 'required|string',
+            'cuerpo'         => 'required|string',
+            'tipo_contenido' => 'required|in:articulo,noticia,video,anuncio',
+        ]);
+
+        $contenido->update($validated);
+
+        return response()->json([
+            'message'   => 'Contenido actualizado correctamente',
+            'contenido' => $contenido,
+        ]);
     }
 
-    public function destroy(string $id): JsonResponse
+    /**
+     * DELETE /api/contenido/{id}
+     */
+    public function destroy(int $id): JsonResponse
     {
-        $c = Contenido::find($id);
-        if (!$c) return response()->json(['error' => 'No encontrado'], 404);
-        $c->delete();
-        return response()->json(['message' => 'Eliminado']);
+        Contenido::findOrFail($id)->delete();
+        return response()->json(['message' => 'Contenido eliminado correctamente']);
     }
 }

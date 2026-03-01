@@ -1,0 +1,122 @@
+<app-navbar />
+
+<main class="productos-page">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Tienda Wellness</h1>
+      <p>Productos cuidadosamente seleccionados para apoyar tu bienestar integral y tu práctica diaria.</p>
+    </div>
+  </section>
+
+  <div class="page-inner">
+
+    @if (errorMsg()) {
+      <div class="alert-error">{{ errorMsg() }}</div>
+    }
+
+    <!-- Filtros -->
+    <div class="filters-row">
+      <div class="search-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" placeholder="Buscar productos..." (input)="onSearch($event)"/>
+      </div>
+      <select (change)="onFilterCat($event)">
+        <option value="">Todas las categorías</option>
+        @for (cat of categorias(); track cat.id_categoria) {
+          <option [value]="cat.id_categoria">{{ cat.nombre }}</option>
+        }
+      </select>
+      <select (change)="onFilterOrden($event)">
+        <option value="">Ordenar por</option>
+        <option value="precio_asc">Menor precio</option>
+        <option value="precio_desc">Mayor precio</option>
+      </select>
+    </div>
+
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="loading-state">
+        <span class="spinner"></span>
+        <p>Cargando productos...</p>
+      </div>
+    }
+
+    @if (!loading()) {
+
+      @if (productos().length === 0) {
+        <div class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+               fill="none" stroke="#C8BFB0" stroke-width="1.5">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+          </svg>
+          <p>No hay productos disponibles en este momento.</p>
+        </div>
+      } @else {
+
+        <div class="results-header">
+          <span>{{ productos().length }} productos encontrados</span>
+        </div>
+
+        <div class="productos-grid">
+          @for (producto of productos(); track producto.id_item) {
+            <div class="card-producto" [class.agotado]="isAgotado(producto)">
+
+              <div class="card-img">
+                <img [src]="getImagen(producto)" [alt]="producto.nombre" loading="lazy"/>
+                @if (isAgotado(producto)) {
+                  <span class="badge-agotado">Agotado</span>
+                }
+                @if (producto.categoria) {
+                  <span class="badge-cat">{{ producto.categoria.nombre }}</span>
+                }
+                <button class="btn-fav" (click)="toggleFavorito(producto.id_item)"
+                        [class.active]="esFavorito(producto.id_item)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                       [attr.fill]="esFavorito(producto.id_item) ? '#C97B4B' : 'none'"
+                       stroke="#C97B4B" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="card-body">
+                @if (producto.producto?.marca) {
+                  <span class="marca">{{ producto.producto?.marca }}</span>
+                }
+                <h3>{{ producto.nombre }}</h3>
+                <p class="descripcion">{{ producto.descripcion }}</p>
+
+                <div class="stock-label" [class.stock-bajo]="(producto.producto?.stock_disponible ?? 0) <= 5 && !isAgotado(producto)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                       fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                  </svg>
+                  {{ getStockLabel(producto) }}
+                </div>
+
+                <div class="card-footer">
+                  <span class="precio">${{ producto.precio | number:'1.2-2' }}</span>
+                  <button class="btn-agregar" [routerLink]="['/dashboard/item', producto.id_item]" [disabled]="false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                    </svg>
+                    {{ isAgotado(producto) ? 'Agotado' : 'Agregar' }}
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+</main>

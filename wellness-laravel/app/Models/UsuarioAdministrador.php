@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class UsuarioAdministrador extends Model
 {
-    protected $table = 'USUARIO_ADMINISTRADOR';
+    protected $table = 'usuario_administrador';
     protected $primaryKey = 'id_usuario';
     public $incrementing = false;
     public $timestamps = false;

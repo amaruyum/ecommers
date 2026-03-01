@@ -1,0 +1,37 @@
+$sage:#7C9A7E; $sage-dark:#6A8A6C; $orange:#C97B4B; $red:#D64545;
+$text:#2D2D2D; $text-muted:#8A8A8A; $border:#EBE7DF; $white:#FFFFFF; $bg:#F5F2EC;
+
+.admin-page { padding: 36px 40px; display: flex; flex-direction: column; gap: 24px; max-width: 1200px; }
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; h1 { font-size: 1.6rem; font-weight: 700; color: $text; margin: 0 0 4px; font-family: 'Helvetica Neue', sans-serif; } p { font-size: 0.875rem; color: $text-muted; margin: 0; font-family: 'Helvetica Neue', sans-serif; } }
+.btn-primary { display: flex; align-items: center; gap: 7px; background: $sage; color: white; border: none; border-radius: 10px; padding: 11px 18px; font-size: 0.875rem; font-weight: 600; cursor: pointer; font-family: 'Helvetica Neue', sans-serif; transition: background 0.2s; &:hover:not(:disabled) { background: $sage-dark; } &:disabled { opacity: 0.7; cursor: not-allowed; } }
+.btn-secondary { background: white; border: 1.5px solid $border; border-radius: 10px; padding: 10px 18px; font-size: 0.875rem; font-weight: 600; color: $text; cursor: pointer; font-family: 'Helvetica Neue', sans-serif; &:hover { border-color: $sage; } }
+.btn-danger { background: $red; color: white; border: none; border-radius: 10px; padding: 10px 18px; font-size: 0.875rem; font-weight: 600; cursor: pointer; font-family: 'Helvetica Neue', sans-serif; }
+.alert { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 10px; font-size: 0.875rem; font-family: 'Helvetica Neue', sans-serif; &-success { background: #f0faf4; border: 1px solid #a8d5b5; color: #2E7D52; } &-error { background: #fdf2f2; border: 1px solid #f5c6c6; color: $red; } }
+.filters-bar { display: flex; gap: 12px; }
+select { padding: 10px 14px; border: 1.5px solid $border; border-radius: 10px; font-size: 0.875rem; font-family: 'Helvetica Neue', sans-serif; background: white; cursor: pointer; outline: none; &:focus { border-color: $sage; } }
+.table-wrap { background: $white; border-radius: 16px; border: 1px solid $border; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+table { width: 100%; border-collapse: collapse; thead tr { background: #FAF9F6; border-bottom: 1px solid $border; } th { padding: 13px 16px; text-align: left; font-size: 0.78rem; font-weight: 700; color: $text-muted; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Helvetica Neue', sans-serif; } tbody tr { border-bottom: 1px solid #F5F2EC; transition: background 0.15s; &:last-child { border-bottom: none; } &:hover { background: #FAFAF8; } } td { padding: 13px 16px; font-size: 0.875rem; color: $text; font-family: 'Helvetica Neue', sans-serif; vertical-align: middle; } }
+.td-id { color: $text-muted; font-size: 0.8rem; } .td-muted { color: $text-muted; font-size: 0.83rem; max-width: 300px; } .td-actions { display: flex; gap: 8px; }
+.badge-tipo { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; font-family: 'Helvetica Neue', sans-serif; &.tipo-articulo { background: rgba(74,144,217,0.1); color: #3A7AC4; } &.tipo-noticia { background: rgba(124,92,191,0.1); color: #6A4CAF; } &.tipo-video { background: rgba(201,123,75,0.1); color: $orange; } &.tipo-anuncio { background: rgba(124,154,126,0.1); color: $sage; } }
+.btn-edit, .btn-delete { display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 8px; border: 1.5px solid $border; background: white; font-size: 0.8rem; font-weight: 600; cursor: pointer; font-family: 'Helvetica Neue', sans-serif; transition: all 0.15s; }
+.btn-edit { color: $text; &:hover { border-color: $sage; color: $sage; background: #EEF3EE; } } .btn-delete { color: $text-muted; &:hover { border-color: $red; color: $red; background: #fdf2f2; } }
+.loading, .empty { padding: 60px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; color: $text-muted; font-family: 'Helvetica Neue', sans-serif; }
+.spinner-dark { width: 20px; height: 20px; border: 2px solid $border; border-top-color: $sage; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 300; padding: 24px; animation: fadeIn 0.15s ease; }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.modal { background: white; border-radius: 20px; width: 100%; max-width: 560px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: slideUp 0.2s ease; padding: 28px; max-height: 90vh; overflow-y: auto; &.modal-lg { max-width: 680px; } &.modal-sm { max-width: 380px; text-align: center; } }
+@keyframes slideUp { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform: translateY(0); } }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; h2 { font-size: 1.2rem; font-weight: 700; color: $text; margin: 0; font-family: 'Helvetica Neue', sans-serif; } }
+.modal-close { background: none; border: none; cursor: pointer; color: $text-muted; padding: 4px; border-radius: 6px; display: flex; align-items: center; &:hover { color: $text; background: #f5f3ef; } }
+.field { margin-bottom: 16px; label { display: block; font-size: 0.875rem; font-weight: 600; color: $text; margin-bottom: 8px; font-family: 'Helvetica Neue', sans-serif; .req { color: $red; } } input, textarea { width: 100%; padding: 10px 13px; border: 1.5px solid $border; border-radius: 10px; font-size: 0.875rem; font-family: 'Helvetica Neue', sans-serif; color: $text; outline: none; transition: border-color 0.2s; box-sizing: border-box; &:focus { border-color: $sage; box-shadow: 0 0 0 3px rgba(124,154,126,0.12); } &.invalid { border-color: $red; } } textarea { resize: vertical; line-height: 1.6; } }
+.field-error { display: block; font-size: 0.78rem; color: $red; margin-top: 4px; font-family: 'Helvetica Neue', sans-serif; }
+.char-count { display: block; font-size: 0.75rem; color: $text-muted; margin-top: 4px; text-align: right; font-family: 'Helvetica Neue', sans-serif; }
+.tipo-selector { display: flex; gap: 8px; flex-wrap: wrap; }
+.tipo-btn { padding: 8px 16px; border-radius: 10px; border: 1.5px solid $border; background: white; font-size: 0.85rem; font-weight: 600; color: $text-muted; cursor: pointer; transition: all 0.2s; font-family: 'Helvetica Neue', sans-serif; &:hover { border-color: $sage; color: $sage; } &.active { border-color: $sage; background: #EEF3EE; color: $sage; } }
+.modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 1px solid $border; }
+.confirm-icon { display: flex; justify-content: center; margin-bottom: 16px; }
+h3 { font-size: 1.1rem; font-weight: 700; color: $text; margin: 0 0 8px; font-family: 'Helvetica Neue', sans-serif; }
+.modal-sm p { font-size: 0.875rem; color: $text-muted; margin: 0; line-height: 1.5; font-family: 'Helvetica Neue', sans-serif; }
+.spinner-sm { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }

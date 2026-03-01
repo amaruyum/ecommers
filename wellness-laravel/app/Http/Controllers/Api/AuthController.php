@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Usuario;
+use App\Models\UsuarioAdministrador;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -20,7 +21,7 @@ class AuthController extends Controller
             'nombre_completo'    => 'required|string|max:255',
             'correo_electronico' => 'required|email|unique:usuario,correo_electronico',
             'telefono'           => 'nullable|string|max:50',
-            'contrasena'         => 'required|string|min:8|confirmed', // requiere contrasena_confirmation
+            'contrasena'         => 'required|string|min:8|confirmed',
         ]);
 
         $usuario = Usuario::create([
@@ -31,13 +32,17 @@ class AuthController extends Controller
             'estado_cuenta'      => 'activo',
         ]);
 
+        $isAdmin = UsuarioAdministrador::where('id_usuario', $usuario->id_usuario)->exists();
+
         return response()->json([
             'message' => 'Usuario creado correctamente',
             'usuario' => [
                 'id_usuario'         => $usuario->id_usuario,
                 'nombre_completo'    => $usuario->nombre_completo,
                 'correo_electronico' => $usuario->correo_electronico,
+                'telefono'           => $usuario->telefono,
                 'estado_cuenta'      => $usuario->estado_cuenta,
+                'is_admin'           => $isAdmin,
             ],
         ], 201);
     }
@@ -56,18 +61,15 @@ class AuthController extends Controller
         $usuario = Usuario::where('correo_electronico', $request->correo_electronico)->first();
 
         if (!$usuario || !Hash::check($request->contrasena, $usuario->contrasena)) {
-            return response()->json([
-                'message' => 'Credenciales incorrectas',
-            ], 401);
+            return response()->json(['message' => 'Credenciales incorrectas'], 401);
         }
 
         if ($usuario->estado_cuenta !== 'activo') {
-            return response()->json([
-                'message' => 'Cuenta inactiva. Contacta al administrador.',
-            ], 403);
+            return response()->json(['message' => 'Cuenta inactiva. Contacta al administrador.'], 403);
         }
 
-        // Genera token Sanctum
+        $isAdmin = UsuarioAdministrador::where('id_usuario', $usuario->id_usuario)->exists();
+
         $token = $usuario->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -77,31 +79,31 @@ class AuthController extends Controller
                 'id_usuario'         => $usuario->id_usuario,
                 'nombre_completo'    => $usuario->nombre_completo,
                 'correo_electronico' => $usuario->correo_electronico,
+                'telefono'           => $usuario->telefono,
                 'estado_cuenta'      => $usuario->estado_cuenta,
+                'is_admin'           => $isAdmin,
             ],
         ]);
     }
 
     /**
-     * Logout — revoca el token actual
-     * POST /api/logout  (requiere auth:sanctum)
+     * Logout
+     * POST /api/logout  (auth:sanctum)
      */
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
-
-        return response()->json([
-            'message' => 'Sesión cerrada correctamente',
-        ]);
+        return response()->json(['message' => 'Sesión cerrada correctamente']);
     }
 
     /**
-     * Devuelve el usuario autenticado
-     * GET /api/me  (requiere auth:sanctum)
+     * Usuario autenticado
+     * GET /api/me  (auth:sanctum)
      */
     public function me(Request $request): JsonResponse
     {
         $usuario = $request->user();
+        $isAdmin = UsuarioAdministrador::where('id_usuario', $usuario->id_usuario)->exists();
 
         return response()->json([
             'id_usuario'         => $usuario->id_usuario,
@@ -109,6 +111,7 @@ class AuthController extends Controller
             'correo_electronico' => $usuario->correo_electronico,
             'telefono'           => $usuario->telefono,
             'estado_cuenta'      => $usuario->estado_cuenta,
+            'is_admin'           => $isAdmin,
         ]);
     }
 }

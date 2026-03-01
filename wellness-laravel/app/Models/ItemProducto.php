@@ -7,20 +7,27 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ItemProducto extends Model
 {
-    protected $table = 'ITEM_PRODUCTO';
+    protected $table      = 'item_producto';
     protected $primaryKey = 'id_item';
-    public $incrementing = false;
-    public $timestamps = false;
+    public    $timestamps = false;
+    public    $incrementing = false;
 
-    protected $fillable = ['id_item', 'marca', 'fecha_elaboracion', 'fecha_caducidad', 'stock_disponible'];
+    protected $fillable = [
+        'id_item',
+        'marca',
+        'fecha_elaboracion',
+        'fecha_caducidad',
+        'stock_disponible',
+    ];
 
     protected $casts = [
         'fecha_elaboracion' => 'date',
-        'fecha_caducidad' => 'date',
+        'fecha_caducidad'   => 'date',
+        'stock_disponible'  => 'integer',
     ];
 
     public function item(): BelongsTo
     {
-        return $this->belongsTo(Item::class, 'id_item');
+        return $this->belongsTo(Item::class, 'id_item', 'id_item');
     }
 }

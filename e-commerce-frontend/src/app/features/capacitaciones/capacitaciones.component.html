@@ -1,0 +1,145 @@
+<app-navbar />
+
+<main class="capacitaciones-page">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Capacitaciones & Talleres</h1>
+      <p>Aprende de instructores expertos y desarrolla nuevas habilidades para transformar tu vida y la de quienes te rodean.</p>
+    </div>
+  </section>
+
+  <div class="page-inner">
+
+    @if (errorMsg()) {
+      <div class="alert-error">{{ errorMsg() }}</div>
+    }
+
+    <!-- Filtros -->
+    <div class="filters-row">
+      <div class="search-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" placeholder="Buscar capacitaciones, talleres..." (input)="onSearch($event)"/>
+      </div>
+      <select (change)="onFilterTipo($event)">
+        @for (t of tiposServicio; track t.value) {
+          <option [value]="t.value">{{ t.label }}</option>
+        }
+      </select>
+      <select (change)="onFilterCat($event)">
+        <option value="">Todas las categorías</option>
+        @for (cat of categorias(); track cat.id_categoria) {
+          <option [value]="cat.id_categoria">{{ cat.nombre }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="loading-state">
+        <span class="spinner"></span>
+        <p>Cargando capacitaciones...</p>
+      </div>
+    }
+
+    @if (!loading()) {
+
+      @if (capacitaciones().length === 0) {
+        <div class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+               fill="none" stroke="#C8BFB0" stroke-width="1.5">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+          <p>No hay capacitaciones disponibles en este momento.</p>
+        </div>
+      } @else {
+
+        <div class="results-header">
+          <span>{{ capacitaciones().length }} resultado{{ capacitaciones().length !== 1 ? 's' : '' }}</span>
+        </div>
+
+        <div class="capacitaciones-grid">
+          @for (item of capacitaciones(); track item.id_item) {
+            <div class="card">
+
+              <div class="card-img">
+                <img [src]="getImagen(item)" [alt]="item.nombre" loading="lazy"/>
+                <span class="badge-tipo" [class]="getTipoColor(item)">{{ getTipoLabel(item) }}</span>
+                <button class="btn-fav" (click)="toggleFavorito(item.id_item)"
+                        [class.active]="esFavorito(item.id_item)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                       [attr.fill]="esFavorito(item.id_item) ? '#C97B4B' : 'none'"
+                       stroke="#C97B4B" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="card-body">
+                @if (item.categoria) {
+                  <span class="categoria-label">{{ item.categoria.nombre }}</span>
+                }
+                <h3>{{ item.nombre }}</h3>
+                <p class="descripcion">{{ item.descripcion }}</p>
+
+                <div class="info-grid">
+                  @if (item.servicio?.fecha_inicio) {
+                    <div class="info-item">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                      <span>{{ formatFecha(item.servicio?.fecha_inicio ?? null) }}</span>
+                    </div>
+                  }
+                  @if (item.servicio?.lugar) {
+                    <div class="info-item">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      <span>{{ item.servicio?.lugar }}</span>
+                    </div>
+                  }
+                  <div class="info-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>{{ getDuracion(item) }}</span>
+                  </div>
+                </div>
+
+                <!-- Barra de cupos -->
+                @if (item.servicio?.cupos_totales) {
+                  <div class="cupos-wrap">
+                    <div class="cupos-header">
+                      <span>Cupos disponibles</span>
+                      <span class="cupos-num">
+                        {{ getCuposInfo(item).disponibles }} / {{ getCuposInfo(item).total }}
+                      </span>
+                    </div>
+                    <div class="cupos-bar">
+                      <div class="cupos-fill"
+                           [style.width.%]="getCuposInfo(item).porcentaje"
+                           [class.cupos-bajo]="getCuposInfo(item).porcentaje <= 25"></div>
+                    </div>
+                  </div>
+                }
+
+                <div class="card-footer">
+                  <div class="precio-wrap">
+                    <span class="precio-label">Inversión</span>
+                    <span class="precio">${{ item.precio | number:'1.2-2' }}</span>
+                  </div>
+                  <button class="btn-inscribirse" [routerLink]="['/dashboard/item', item.id_item]"
+                          [disabled]="getCuposInfo(item).disponibles === 0">
+                    {{ getCuposInfo(item).disponibles === 0 ? 'Sin cupos' : 'Inscribirse' }}
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+</main>

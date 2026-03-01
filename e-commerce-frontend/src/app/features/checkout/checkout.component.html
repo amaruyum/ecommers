@@ -1,0 +1,214 @@
+<app-navbar />
+
+<div class="checkout-page">
+
+  <!-- ── PASO 3: CONFIRMADO ─────────────────────────────── -->
+  @if (step() === 3) {
+    <div class="confirmed">
+      <div class="confirmed-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+             fill="none" stroke="white" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <h1>¡Pedido recibido!</h1>
+      <p>Gracias por tu compra. Te contactaremos pronto para coordinar la entrega y el pago.</p>
+      <div class="confirmed-details">
+        <span>📧 Recibirás un correo de confirmación</span>
+        <span>📞 Te llamaremos en las próximas 24h</span>
+      </div>
+      <button class="btn-primary" (click)="volverTienda()">
+        Seguir comprando
+      </button>
+    </div>
+  }
+
+  @if (step() !== 3) {
+    <div class="checkout-inner">
+
+      <!-- Breadcrumb steps -->
+      <div class="steps">
+        <div class="step" [class.active]="step() === 1" [class.done]="step() > 1">
+          <span class="step-num">{{ step() > 1 ? '✓' : '1' }}</span>
+          <span>Datos de entrega</span>
+        </div>
+        <div class="step-line" [class.done]="step() > 1"></div>
+        <div class="step" [class.active]="step() === 2">
+          <span class="step-num">2</span>
+          <span>Confirmar pedido</span>
+        </div>
+      </div>
+
+      <div class="checkout-grid">
+
+        <!-- ── COLUMNA IZQUIERDA ─────────────────────────── -->
+        <div class="col-form">
+
+          @if (step() === 1) {
+            <div class="card">
+              <h2>Datos de entrega</h2>
+
+              <form [formGroup]="form" novalidate>
+                <div class="field-row">
+                  <div class="field">
+                    <label>Nombre completo <span class="req">*</span></label>
+                    <input type="text" formControlName="nombre" placeholder="Tu nombre"
+                           [class.invalid]="f('nombre')?.invalid && f('nombre')?.touched"/>
+                    @if (f('nombre')?.invalid && f('nombre')?.touched) {
+                      <span class="field-error">Campo requerido</span>
+                    }
+                  </div>
+                  <div class="field">
+                    <label>Teléfono <span class="req">*</span></label>
+                    <input type="tel" formControlName="telefono" placeholder="+593 99 000 0000"
+                           [class.invalid]="f('telefono')?.invalid && f('telefono')?.touched"/>
+                    @if (f('telefono')?.invalid && f('telefono')?.touched) {
+                      <span class="field-error">Campo requerido</span>
+                    }
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Correo electrónico <span class="req">*</span></label>
+                  <input type="email" formControlName="email" placeholder="tu@email.com"
+                         [class.invalid]="f('email')?.invalid && f('email')?.touched"/>
+                  @if (f('email')?.invalid && f('email')?.touched) {
+                    <span class="field-error">Correo inválido</span>
+                  }
+                </div>
+
+                <div class="field-row">
+                  <div class="field">
+                    <label>Ciudad <span class="req">*</span></label>
+                    <input type="text" formControlName="ciudad" placeholder="Quito"
+                           [class.invalid]="f('ciudad')?.invalid && f('ciudad')?.touched"/>
+                    @if (f('ciudad')?.invalid && f('ciudad')?.touched) {
+                      <span class="field-error">Campo requerido</span>
+                    }
+                  </div>
+                  <div class="field">
+                    <label>Dirección <span class="req">*</span></label>
+                    <input type="text" formControlName="direccion" placeholder="Av. Principal 123"
+                           [class.invalid]="f('direccion')?.invalid && f('direccion')?.touched"/>
+                    @if (f('direccion')?.invalid && f('direccion')?.touched) {
+                      <span class="field-error">Campo requerido</span>
+                    }
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Notas adicionales</label>
+                  <textarea formControlName="notas" rows="3"
+                            placeholder="Instrucciones de entrega, referencias, etc."></textarea>
+                </div>
+
+                <div class="field">
+                  <label>Método de pago <span class="req">*</span></label>
+                  <div class="metodos-pago">
+                    @for (m of [{v:'transferencia',l:'🏦 Transferencia bancaria'},{v:'efectivo',l:'💵 Pago en efectivo'},{v:'tarjeta',l:'💳 Tarjeta de crédito/débito'}]; track m.v) {
+                      <label class="metodo-option" [class.selected]="f('metodo_pago')?.value === m.v">
+                        <input type="radio" formControlName="metodo_pago" [value]="m.v"/>
+                        {{ m.l }}
+                      </label>
+                    }
+                  </div>
+                </div>
+
+              </form>
+
+              <button class="btn-primary full" (click)="irResumen()">
+                Revisar pedido →
+              </button>
+            </div>
+          }
+
+          @if (step() === 2) {
+            <div class="card">
+              <div class="resumen-header">
+                <h2>Confirmación del pedido</h2>
+                <button class="btn-back" (click)="step.set(1)">← Editar datos</button>
+              </div>
+
+              <div class="datos-resumen">
+                <div class="dato-row">
+                  <span>Nombre</span>
+                  <strong>{{ f('nombre')?.value }}</strong>
+                </div>
+                <div class="dato-row">
+                  <span>Teléfono</span>
+                  <strong>{{ f('telefono')?.value }}</strong>
+                </div>
+                <div class="dato-row">
+                  <span>Email</span>
+                  <strong>{{ f('email')?.value }}</strong>
+                </div>
+                <div class="dato-row">
+                  <span>Dirección</span>
+                  <strong>{{ f('direccion')?.value }}, {{ f('ciudad')?.value }}</strong>
+                </div>
+                <div class="dato-row">
+                  <span>Método de pago</span>
+                  <strong>{{ getMetodoPagoLabel(f('metodo_pago')?.value) }}</strong>
+                </div>
+                @if (f('notas')?.value) {
+                  <div class="dato-row">
+                    <span>Notas</span>
+                    <strong>{{ f('notas')?.value }}</strong>
+                  </div>
+                }
+              </div>
+
+              <button class="btn-primary full" [disabled]="submitting()" (click)="confirmarPedido()">
+                @if (submitting()) {
+                  <span class="spinner"></span> Procesando...
+                } @else {
+                  ✓ Confirmar pedido
+                }
+              </button>
+            </div>
+          }
+
+        </div>
+
+        <!-- ── COLUMNA DERECHA: Resumen ───────────────────── -->
+        <div class="col-resumen">
+          <div class="card resumen-card">
+            <h3>Tu pedido</h3>
+            <ul class="resumen-list">
+              @for (ci of cart.items(); track ci.item.id_item) {
+                <li class="resumen-item">
+                  <div class="resumen-img">
+                    <img [src]="getImagen(ci)" [alt]="ci.item.nombre"/>
+                    <span class="resumen-qty">{{ ci.cantidad }}</span>
+                  </div>
+                  <div class="resumen-info">
+                    <span class="resumen-nombre">{{ ci.item.nombre }}</span>
+                    <span class="resumen-unit">${{ ci.item.precio | number:'1.2-2' }} c/u</span>
+                  </div>
+                  <span class="resumen-precio">${{ (ci.item.precio * ci.cantidad) | number:'1.2-2' }}</span>
+                </li>
+              }
+            </ul>
+
+            <div class="resumen-totales">
+              <div class="total-row">
+                <span>Subtotal</span>
+                <span>${{ cart.subtotal() | number:'1.2-2' }}</span>
+              </div>
+              <div class="total-row">
+                <span>Envío</span>
+                <span class="envio-gratis">A coordinar</span>
+              </div>
+              <div class="total-row total-final">
+                <strong>Total</strong>
+                <strong>${{ cart.subtotal() | number:'1.2-2' }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  }
+
+</div>

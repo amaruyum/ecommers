@@ -1,0 +1,292 @@
+<div class="admin-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>Gestión de Usuarios</h1>
+      <p>Administra clientes, instructores y administradores</p>
+    </div>
+    <button class="btn-primary" (click)="openCreate()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+           fill="none" stroke="white" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Nuevo Usuario
+    </button>
+  </div>
+
+  <!-- Mensajes -->
+  @if (successMsg()) { <div class="alert alert-success">✓ {{ successMsg() }}</div> }
+  @if (errorMsg() && !showModal()) { <div class="alert alert-error">{{ errorMsg() }}</div> }
+
+  <!-- Filtros -->
+  <div class="filters-bar">
+    <div class="search-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" placeholder="Buscar por nombre o email..." (input)="onSearch($event)"/>
+    </div>
+    <select (change)="onFilterRol($event)">
+      <option value="">Todos los roles</option>
+      <option value="cliente">Cliente</option>
+      <option value="instructor">Instructor</option>
+      <option value="admin">Administrador</option>
+    </select>
+    <select (change)="onFilterEstado($event)">
+      <option value="">Todos los estados</option>
+      <option value="activo">Activo</option>
+      <option value="inactivo">Inactivo</option>
+      <option value="suspendido">Suspendido</option>
+    </select>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-wrap">
+    @if (loading()) {
+      <div class="loading"><span class="spinner-dark"></span> Cargando...</div>
+    } @else if (usuarios().length === 0) {
+      <div class="empty">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+             fill="none" stroke="#C8BFB0" stroke-width="1.5">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+        </svg>
+        <p>No hay usuarios registrados.</p>
+      </div>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Registro</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of usuarios(); track u.id_usuario) {
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar">{{ getInitials(u.nombre_completo) }}</div>
+                  <span class="user-nombre">{{ u.nombre_completo }}</span>
+                </div>
+              </td>
+              <td class="td-muted">{{ u.correo_electronico }}</td>
+              <td class="td-muted">{{ u.telefono || '—' }}</td>
+              <td>
+                <span class="badge-rol" [class]="'rol-' + getRolBadge(u.roles)">
+                  {{ getRolBadge(u.roles) }}
+                </span>
+              </td>
+              <td>
+                <span class="badge-estado" [class]="'estado-' + u.estado_cuenta">
+                  {{ u.estado_cuenta }}
+                </span>
+              </td>
+              <td class="td-muted">
+                {{ u.fecha_registro ? (u.fecha_registro | date:'dd/MM/yyyy') : '—' }}
+              </td>
+              <td class="td-actions">
+                <button class="btn-edit" (click)="openEdit(u)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                       fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                  Editar
+                </button>
+                <button class="btn-delete" (click)="confirmDelete(u)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                       fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                  </svg>
+                  Eliminar
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>
+
+<!-- Modal -->
+@if (showModal()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal modal-lg" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <h2>{{ editingId() ? 'Editar Usuario' : 'Nuevo Usuario' }}</h2>
+        <button class="modal-close" (click)="closeModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      @if (errorMsg()) { <div class="alert alert-error" style="margin-bottom:16px">{{ errorMsg() }}</div> }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+        <!-- Rol selector -->
+        @if (!editingId()) {
+          <div class="rol-selector">
+            <button type="button" class="rol-btn" [class.active]="esCliente"
+                    (click)="form.get('rol')?.setValue('cliente')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              Cliente
+            </button>
+            <button type="button" class="rol-btn" [class.active]="esInstructor"
+                    (click)="form.get('rol')?.setValue('instructor')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+              </svg>
+              Instructor
+            </button>
+            <button type="button" class="rol-btn" [class.active]="rolSeleccionado() === 'admin'"
+                    (click)="form.get('rol')?.setValue('admin')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              Administrador
+            </button>
+          </div>
+        }
+
+        <!-- Datos base -->
+        <div class="form-section">
+          <h3 class="section-label">Datos Personales</h3>
+          <div class="field-row">
+            <div class="field">
+              <label>Nombre Completo <span class="req">*</span></label>
+              <input type="text" formControlName="nombre_completo"
+                     placeholder="Ej: María López"
+                     [class.invalid]="nombre?.invalid && nombre?.touched"/>
+              @if (nombre?.invalid && nombre?.touched) {
+                <span class="field-error">El nombre es obligatorio</span>
+              }
+            </div>
+            <div class="field">
+              <label>Teléfono</label>
+              <input type="text" formControlName="telefono" placeholder="Ej: +593 99 123 4567"/>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Correo Electrónico <span class="req">*</span></label>
+              <input type="email" formControlName="correo_electronico"
+                     placeholder="correo@ejemplo.com"
+                     [class.invalid]="email?.invalid && email?.touched"/>
+              @if (email?.invalid && email?.touched) {
+                <span class="field-error">Ingresa un correo válido</span>
+              }
+            </div>
+            <div class="field">
+              <label>{{ editingId() ? 'Nueva Contraseña (dejar vacío para no cambiar)' : 'Contraseña *' }}</label>
+              <input type="password" formControlName="contrasena"
+                     [placeholder]="editingId() ? '••••••••' : 'Mínimo 8 caracteres'"
+                     [class.invalid]="password?.invalid && password?.touched"/>
+              @if (password?.invalid && password?.touched) {
+                <span class="field-error">Mínimo 8 caracteres</span>
+              }
+            </div>
+          </div>
+          <div class="field" style="max-width: 240px">
+            <label>Estado de Cuenta <span class="req">*</span></label>
+            <select formControlName="estado_cuenta">
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+              <option value="suspendido">Suspendido</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Campos Cliente -->
+        @if (esCliente) {
+          <div class="form-section">
+            <h3 class="section-label section-cliente">Datos del Cliente</h3>
+            <div class="field-row">
+              <div class="field">
+                <label>Ciudad</label>
+                <input type="text" formControlName="ciudad" placeholder="Ej: Quito"/>
+              </div>
+              <div class="field">
+                <label>Dirección</label>
+                <input type="text" formControlName="direccion" placeholder="Dirección completa"/>
+              </div>
+            </div>
+            <div class="field">
+              <label>Preferencias</label>
+              <textarea formControlName="preferencias" rows="2"
+                        placeholder="Ej: Yoga, Meditación, Nutrición..."></textarea>
+            </div>
+          </div>
+        }
+
+        <!-- Campos Instructor -->
+        @if (esInstructor) {
+          <div class="form-section">
+            <h3 class="section-label section-instructor">Datos del Instructor</h3>
+            <div class="field">
+              <label>Especialidad</label>
+              <input type="text" formControlName="especialidad"
+                     placeholder="Ej: Yoga Hatha, Meditación Mindfulness"/>
+            </div>
+            <div class="field">
+              <label>Descripción Personal</label>
+              <textarea formControlName="descripcion_perfil" rows="3"
+                        placeholder="Describe la experiencia y enfoque del instructor..."></textarea>
+            </div>
+          </div>
+        }
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeModal()">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="saving()">
+            @if (saving()) { <span class="spinner-sm"></span> Guardando... }
+            @else { {{ editingId() ? 'Actualizar' : 'Crear Usuario' }} }
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Confirm Delete -->
+@if (showConfirm()) {
+  <div class="modal-overlay" (click)="cancelDelete()">
+    <div class="modal modal-sm" (click)="$event.stopPropagation()">
+      <div class="confirm-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+             fill="none" stroke="#D64545" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <h3>¿Eliminar usuario?</h3>
+      <p>Vas a eliminar a <strong>{{ deletingNombre() }}</strong>. Esta acción no se puede deshacer.</p>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cancelDelete()">Cancelar</button>
+        <button class="btn-danger" (click)="doDelete()">Sí, eliminar</button>
+      </div>
+    </div>
+  </div>
+}

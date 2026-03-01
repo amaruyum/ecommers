@@ -1,0 +1,313 @@
+<div class="dashboard">
+
+  <!-- Header -->
+  <div class="dash-header">
+    <div>
+      <h1>Dashboard</h1>
+      <p>Resumen general de la plataforma</p>
+    </div>
+    <button class="btn-refresh" (click)="loadStats()" [disabled]="loading()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2"
+           [class.spinning]="loading()">
+        <polyline points="23 4 23 10 17 10"/>
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+      </svg>
+      Actualizar
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <span class="spinner"></span>
+      <p>Cargando estadísticas...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert-error">{{ error() }}</div>
+  }
+
+  @if (!loading() && stats()) {
+
+    <!-- ── Stat cards ─────────────────────────────────────── -->
+    <div class="stats-grid">
+
+      <div class="stat-card">
+        <div class="stat-icon icon-blue">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <div class="stat-body">
+          <span class="stat-label">Usuarios Totales</span>
+          <span class="stat-value">{{ stats()!.usuarios.total }}</span>
+          <div class="stat-breakdown">
+            <span class="break-item">
+              <span class="dot dot-blue"></span>{{ stats()!.usuarios.clientes }} clientes
+            </span>
+            <span class="break-item">
+              <span class="dot dot-orange"></span>{{ stats()!.usuarios.instructores }} instructores
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-sage">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+          </svg>
+        </div>
+        <div class="stat-body">
+          <span class="stat-label">Items en Catálogo</span>
+          <span class="stat-value">{{ stats()!.items.total }}</span>
+          <div class="stat-breakdown">
+            <span class="break-item">
+              <span class="dot dot-sage"></span>{{ stats()!.items.activos }} activos
+            </span>
+            @if (stats()!.items.agotados > 0) {
+              <span class="break-item">
+                <span class="dot dot-red"></span>{{ stats()!.items.agotados }} agotados
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-orange">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <div class="stat-body">
+          <span class="stat-label">Servicios & Retiros</span>
+          <span class="stat-value">{{ stats()!.items.servicios }}</span>
+          <div class="stat-breakdown">
+            <span class="break-item">
+              <span class="dot dot-sage"></span>{{ stats()!.servicios_proximos.length }} próximos
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card" [class.card-alert]="stats()!.stock_bajo.length > 0">
+        <div class="stat-icon" [class]="stats()!.stock_bajo.length > 0 ? 'icon-red' : 'icon-sage'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <div class="stat-body">
+          <span class="stat-label">Stock Bajo</span>
+          <span class="stat-value">{{ stats()!.stock_bajo.length }}</span>
+          <div class="stat-breakdown">
+            <span class="break-item" [class.text-red]="stats()!.stock_bajo.length > 0">
+              {{ stats()!.stock_bajo.length > 0 ? 'Requieren atención' : 'Todo en orden' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Segunda fila: tipo de items ───────────────────── -->
+    <div class="mini-stats">
+      <div class="mini-card">
+        <span class="mini-num">{{ stats()!.items.productos }}</span>
+        <span class="mini-label">Productos físicos</span>
+      </div>
+      <div class="mini-card">
+        <span class="mini-num">{{ stats()!.items.servicios }}</span>
+        <span class="mini-label">Servicios / Retiros</span>
+      </div>
+      <div class="mini-card">
+        <span class="mini-num">{{ stats()!.categorias.total }}</span>
+        <span class="mini-label">Categorías</span>
+      </div>
+      <div class="mini-card">
+        <span class="mini-num">{{ stats()!.usuarios.admins }}</span>
+        <span class="mini-label">Administradores</span>
+      </div>
+    </div>
+
+    <!-- ── Contenido principal ────────────────────────────── -->
+    <div class="main-grid">
+
+      <!-- Servicios próximos -->
+      <div class="section-card">
+        <div class="section-head">
+          <h3>Servicios Próximos</h3>
+          <a [routerLink]="['/admin/catalogo/items']" class="ver-todos">Ver todos →</a>
+        </div>
+
+        @if (stats()!.servicios_proximos.length === 0) {
+          <div class="empty-section">
+            <p>No hay servicios próximos programados.</p>
+            <a [routerLink]="['/admin/catalogo/items']" class="btn-add">+ Agregar servicio</a>
+          </div>
+        } @else {
+          <div class="servicios-list">
+            @for (s of stats()!.servicios_proximos; track s.id_item) {
+              <div class="servicio-row">
+                <div class="servicio-date">
+                  <span class="date-day">{{ formatFechaCorta(s.fecha_inicio) }}</span>
+                </div>
+                <div class="servicio-info">
+                  <span class="servicio-nombre">{{ s.nombre }}</span>
+                  <span class="servicio-meta">
+                    @if (s.lugar) { 📍 {{ s.lugar }} · }
+                    {{ getTipoLabel(s.tipo_servicio) }}
+                  </span>
+                </div>
+                <div class="servicio-cupos">
+                  <div class="cupos-bar-mini">
+                    <div class="cupos-fill-mini"
+                         [style.width.%]="getCuposPct(s.cupos_disponibles, s.cupos_totales)"
+                         [class.bajo]="getCuposPct(s.cupos_disponibles, s.cupos_totales) <= 25">
+                    </div>
+                  </div>
+                  <span class="cupos-txt">{{ s.cupos_disponibles }}/{{ s.cupos_totales }}</span>
+                </div>
+                <span class="servicio-precio">${{ s.precio | number:'1.0-0' }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Items por categoría -->
+      <div class="section-card">
+        <div class="section-head">
+          <h3>Items por Categoría</h3>
+          <a [routerLink]="['/admin/catalogo/categorias']" class="ver-todos">Gestionar →</a>
+        </div>
+
+        @if (stats()!.items_por_categoria.length === 0) {
+          <div class="empty-section">
+            <p>No hay categorías con items.</p>
+          </div>
+        } @else {
+          <div class="categorias-list">
+            @for (cat of stats()!.items_por_categoria; track cat.nombre) {
+              <div class="cat-row">
+                <span class="cat-nombre">{{ cat.nombre }}</span>
+                <div class="cat-bar-wrap">
+                  <div class="cat-bar">
+                    <div class="cat-fill"
+                         [style.width.%]="getBarWidth(cat.total, getMaxCategoria())">
+                    </div>
+                  </div>
+                </div>
+                <span class="cat-total">{{ cat.total }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+    </div>
+
+    <!-- ── Segunda fila de secciones ─────────────────────── -->
+    <div class="main-grid">
+
+      <!-- Usuarios recientes -->
+      <div class="section-card">
+        <div class="section-head">
+          <h3>Usuarios Recientes</h3>
+          <a [routerLink]="['/admin/usuarios']" class="ver-todos">Ver todos →</a>
+        </div>
+
+        @if (stats()!.usuarios_recientes.length === 0) {
+          <div class="empty-section"><p>No hay usuarios registrados aún.</p></div>
+        } @else {
+          <div class="usuarios-list">
+            @for (u of stats()!.usuarios_recientes; track u.id_usuario) {
+              <div class="usuario-row">
+                <div class="u-avatar">{{ getInitials(u.nombre_completo) }}</div>
+                <div class="u-info">
+                  <span class="u-nombre">{{ u.nombre_completo }}</span>
+                  <span class="u-email">{{ u.correo_electronico }}</span>
+                </div>
+                <div class="u-right">
+                  <span class="badge-estado" [class]="'estado-' + u.estado_cuenta">{{ u.estado_cuenta }}</span>
+                  <span class="u-fecha">{{ formatFecha(u.fecha_registro) }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Stock bajo -->
+      <div class="section-card" [class.card-alert-soft]="stats()!.stock_bajo.length > 0">
+        <div class="section-head">
+          <h3>
+            @if (stats()!.stock_bajo.length > 0) {
+              <span class="alert-dot"></span>
+            }
+            Alertas de Stock
+          </h3>
+          <a [routerLink]="['/admin/catalogo/items']" class="ver-todos">Ver items →</a>
+        </div>
+
+        @if (stats()!.stock_bajo.length === 0) {
+          <div class="empty-section ok">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                 fill="none" stroke="#7C9A7E" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <p>Todos los productos tienen stock suficiente.</p>
+          </div>
+        } @else {
+          <div class="stock-list">
+            @for (item of stats()!.stock_bajo; track item.id_item) {
+              <div class="stock-row">
+                <div class="stock-info">
+                  <span class="stock-nombre">{{ item.nombre }}</span>
+                  @if (item.marca) { <span class="stock-marca">{{ item.marca }}</span> }
+                </div>
+                <span class="stock-badge" [class.stock-zero]="item.stock_disponible === 0">
+                  {{ item.stock_disponible === 0 ? 'Agotado' : item.stock_disponible + ' uds' }}
+                </span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+    </div>
+
+    <!-- ── Quick actions ─────────────────────────────────── -->
+    <div class="quick-actions">
+      <h3>Acciones Rápidas</h3>
+      <div class="actions-row">
+        <a [routerLink]="['/admin/usuarios']" class="action-btn action-blue">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nuevo Usuario
+        </a>
+        <a [routerLink]="['/admin/catalogo/items']" class="action-btn action-sage">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nuevo Item
+        </a>
+        <a [routerLink]="['/admin/catalogo/categorias']" class="action-btn action-orange">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nueva Categoría
+        </a>
+      </div>
+    </div>
+
+  }
+</div>

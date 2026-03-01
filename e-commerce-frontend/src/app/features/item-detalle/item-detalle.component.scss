@@ -1,0 +1,144 @@
+$sage:       #7C9A7E;
+$sage-dark:  #6A8A6C;
+$orange:     #C97B4B;
+$red:        #D64545;
+$text:       #2D2D2D;
+$text-muted: #8A8A8A;
+$border:     #EBE7DF;
+$white:      #FFFFFF;
+$bg:         #F5F2EC;
+
+.detalle-page { min-height: calc(100vh - 64px); background: $bg; padding: 32px 24px; }
+
+.detalle-inner { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+
+// Breadcrumb
+.breadcrumb {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.85rem; font-family: 'Helvetica Neue', sans-serif; color: $text-muted;
+  button { background: none; border: none; cursor: pointer; color: $sage; font-weight: 600; font-size: 0.85rem; padding: 0; font-family: 'Helvetica Neue', sans-serif; &:hover { text-decoration: underline; } }
+  span::before { content: '/'; margin-right: 8px; }
+  .bc-current { color: $text; font-weight: 600; }
+}
+
+// Main grid
+.detalle-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start;
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+}
+
+// Image column
+.img-col { display: flex; flex-direction: column; gap: 16px; }
+
+.img-wrap {
+  position: relative; border-radius: 20px; overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  img { width: 100%; height: 380px; object-fit: cover; display: block; }
+}
+.img-badges {
+  position: absolute; bottom: 14px; left: 14px; display: flex; gap: 8px;
+}
+.badge-cat {
+  background: rgba(0,0,0,0.6); color: white; font-size: 0.72rem; font-weight: 700;
+  padding: 4px 12px; border-radius: 20px; font-family: 'Helvetica Neue', sans-serif; backdrop-filter: blur(4px);
+}
+.badge-tipo {
+  font-size: 0.72rem; font-weight: 700; padding: 4px 12px; border-radius: 20px;
+  font-family: 'Helvetica Neue', sans-serif; backdrop-filter: blur(4px);
+  &.tipo-producto { background: rgba(74,144,217,0.85); color: white; }
+  &.tipo-servicio { background: rgba(124,154,126,0.85); color: white; }
+}
+
+// Quick info
+.quick-info {
+  background: $white; border-radius: 16px; border: 1px solid $border;
+  padding: 20px; display: flex; flex-direction: column; gap: 14px;
+}
+.qi-item { display: flex; align-items: flex-start; gap: 12px; }
+.qi-label { display: block; font-size: 0.72rem; color: $text-muted; font-family: 'Helvetica Neue', sans-serif; text-transform: uppercase; letter-spacing: 0.4px; }
+.qi-val   { display: block; font-size: 0.88rem; font-weight: 600; color: $text; font-family: 'Helvetica Neue', sans-serif; margin-top: 2px; }
+
+// Info column
+.info-col { display: flex; flex-direction: column; gap: 20px; }
+
+h1 { font-size: 1.8rem; font-weight: 800; color: $text; margin: 0; font-family: 'Georgia', serif; line-height: 1.3; }
+
+.descripcion { font-size: 0.95rem; color: $text-muted; line-height: 1.7; margin: 0; font-family: 'Helvetica Neue', sans-serif; }
+
+// Detalles section
+.detalles-section {
+  background: $white; border-radius: 14px; border: 1px solid $border; padding: 18px;
+  h3 { font-size: 0.9rem; font-weight: 700; color: $text; margin: 0 0 14px; font-family: 'Helvetica Neue', sans-serif; text-transform: uppercase; letter-spacing: 0.4px; }
+}
+.detalles-grid { display: flex; flex-direction: column; gap: 10px; }
+.detalle-row { display: flex; justify-content: space-between; align-items: center; }
+.det-label { font-size: 0.82rem; color: $text-muted; font-family: 'Helvetica Neue', sans-serif; }
+.det-val   { font-size: 0.88rem; font-weight: 600; color: $text; font-family: 'Helvetica Neue', sans-serif; &.stock-bajo { color: $orange; } }
+
+.itinerario-text, .politicas-text {
+  font-size: 0.875rem; color: $text-muted; line-height: 1.7; margin: 0;
+  font-family: 'Helvetica Neue', sans-serif; white-space: pre-line;
+}
+
+// Cupos
+.cupos-section { display: flex; flex-direction: column; gap: 8px; }
+.cupos-header { display: flex; justify-content: space-between; font-size: 0.85rem; color: $text-muted; font-family: 'Helvetica Neue', sans-serif; strong { color: $text; } }
+.cupos-bar { height: 6px; background: $border; border-radius: 10px; overflow: hidden; }
+.cupos-fill { height: 100%; background: $sage; border-radius: 10px; transition: width 0.4s; &.cupos-bajo { background: $orange; } }
+
+// Compra box
+.compra-box {
+  background: $white; border-radius: 18px; border: 1px solid $border;
+  padding: 24px; display: flex; flex-direction: column; gap: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+.precio-wrap { display: flex; justify-content: space-between; align-items: center; }
+.precio-label { font-size: 0.85rem; color: $text-muted; font-family: 'Helvetica Neue', sans-serif; }
+.precio { font-size: 1.6rem; font-weight: 800; color: $orange; font-family: 'Helvetica Neue', sans-serif; }
+
+.cantidad-wrap { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-top: 1px solid $border; border-bottom: 1px solid $border; }
+.cantidad-label { font-size: 0.875rem; font-weight: 600; color: $text; font-family: 'Helvetica Neue', sans-serif; }
+.cantidad-ctrl {
+  display: flex; align-items: center; gap: 16px;
+  button {
+    width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid $border; background: white;
+    font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-family: 'Helvetica Neue', sans-serif; transition: border-color 0.2s;
+    &:hover { border-color: $sage; color: $sage; }
+  }
+  span { font-size: 1rem; font-weight: 700; color: $text; min-width: 24px; text-align: center; font-family: 'Helvetica Neue', sans-serif; }
+}
+
+.total-wrap {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.9rem; color: $text-muted; font-family: 'Helvetica Neue', sans-serif;
+  strong { font-size: 1.1rem; color: $text; }
+}
+
+.btn-accion {
+  &.en-carrito { background: #5A8A5C !important; }
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: $sage; color: white; border: none; border-radius: 14px;
+  padding: 15px; font-size: 1rem; font-weight: 700; cursor: pointer;
+  font-family: 'Helvetica Neue', sans-serif; transition: background 0.2s; width: 100%;
+  &:hover:not(:disabled) { background: $sage-dark; }
+  &:disabled { background: #C8BFB0; cursor: not-allowed; }
+}
+
+.estado-nota { margin: 0; text-align: center; font-size: 0.82rem; font-family: 'Helvetica Neue', sans-serif; }
+.nota-red   { color: $red; }
+.nota-green { color: $sage; }
+
+// States
+.loading-state, .error-state {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 16px; padding: 100px 24px; text-align: center;
+  color: $text-muted; font-family: 'Helvetica Neue', sans-serif;
+}
+.spinner { width: 36px; height: 36px; border: 3px solid $border; border-top-color: $sage; border-radius: 50%; animation: spin 0.8s linear infinite; display: block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn-volver {
+  background: $sage; color: white; border: none; border-radius: 10px;
+  padding: 10px 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  font-family: 'Helvetica Neue', sans-serif;
+}

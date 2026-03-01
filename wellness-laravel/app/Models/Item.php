@@ -8,11 +8,17 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Item extends Model
 {
-    protected $table = 'ITEM';
+    protected $table      = 'item';
     protected $primaryKey = 'id_item';
-    public $timestamps = false;
+    public    $timestamps = false;
 
-    protected $fillable = ['id_categoria', 'nombre', 'descripcion', 'estado', 'precio'];
+    protected $fillable = [
+        'id_categoria',
+        'nombre',
+        'descripcion',
+        'estado',
+        'precio',
+    ];
 
     protected $casts = [
         'precio' => 'decimal:2',
@@ -20,26 +26,16 @@ class Item extends Model
 
     public function categoria(): BelongsTo
     {
-        return $this->belongsTo(Categoria::class, 'id_categoria');
+        return $this->belongsTo(Categoria::class, 'id_categoria', 'id_categoria');
     }
 
-    public function itemProducto(): HasOne
+    public function producto(): HasOne
     {
-        return $this->hasOne(ItemProducto::class, 'id_item');
+        return $this->hasOne(ItemProducto::class, 'id_item', 'id_item');
     }
 
-    public function itemServicio(): HasOne
+    public function servicio(): HasOne
     {
-        return $this->hasOne(ItemServicio::class, 'id_item');
-    }
-
-    public function inventarios(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(Inventario::class, 'id_item');
-    }
-
-    public function resenas(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(Resena::class, 'id_item');
+        return $this->hasOne(ItemServicio::class, 'id_item', 'id_item');
     }
 }

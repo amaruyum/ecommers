@@ -2,19 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class Usuario extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens;
 
-    protected $table      = 'usuario';       // ← minúsculas para PostgreSQL
+    protected $table      = 'usuario';
     protected $primaryKey = 'id_usuario';
-    public $timestamps    = false;
+    public    $timestamps  = false;
 
     protected $fillable = [
         'correo_electronico',
@@ -26,35 +24,20 @@ class Usuario extends Authenticatable
 
     protected $hidden = ['contrasena'];
 
-    protected $casts = [
-        'fecha_registro'     => 'datetime',
-        'fecha_modificacion' => 'datetime',
-        'contrasena'         => 'hashed',   // ← bcrypt automático en Laravel 10+
-    ];
-
-    // ─── Relaciones ───────────────────────────────────────────────
-    public function roles(): BelongsToMany
-    {
-        return $this->belongsToMany(Rol::class, 'usuario_rol', 'id_usuario', 'id_rol');
-    }
+    protected string $authPasswordName = 'contrasena';
 
     public function cliente(): HasOne
     {
-        return $this->hasOne(UsuarioCliente::class, 'id_usuario');
+        return $this->hasOne(UsuarioCliente::class, 'id_usuario', 'id_usuario');
     }
 
     public function instructor(): HasOne
     {
-        return $this->hasOne(UsuarioInstructor::class, 'id_usuario');
+        return $this->hasOne(UsuarioInstructor::class, 'id_usuario', 'id_usuario');
     }
 
     public function administrador(): HasOne
     {
-        return $this->hasOne(UsuarioAdministrador::class, 'id_usuario');
-    }
-
-    public function notificaciones()
-    {
-        return $this->hasMany(Notificacion::class, 'id_usuario');
+        return $this->hasOne(UsuarioAdministrador::class, 'id_usuario', 'id_usuario');
     }
 }

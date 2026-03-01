@@ -1,0 +1,771 @@
+{
+  "info": {
+    "name": "Wellness API",
+    "description": "Colección completa de endpoints para el proyecto Wellness. Base URL: http://localhost:8000/api\n\n**Instrucciones:**\n1. Ejecuta 'Login Admin' o 'Login Usuario'\n2. El token se guarda automáticamente en la variable {{token}}\n3. El resto de requests ya lo usan en el header Authorization",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api", "type": "string" },
+    { "key": "token",    "value": "",                          "type": "string" }
+  ],
+  "item": [
+
+    {
+      "name": "🔐 Auth",
+      "item": [
+
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/register", "host": ["{{base_url}}"], "path": ["register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre_completo\": \"Usuario Test\",\n  \"correo_electronico\": \"test@wellness.com\",\n  \"contrasena\": \"password123\",\n  \"contrasena_confirmation\": \"password123\",\n  \"telefono\": \"+593 99 123 4567\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Login Admin",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "const res = pm.response.json();",
+                "if (res.token) {",
+                "  pm.collectionVariables.set('token', res.token);",
+                "  console.log('✅ Token guardado:', res.token.substring(0,20) + '...');",
+                "}"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/login", "host": ["{{base_url}}"], "path": ["login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo_electronico\": \"admin@wellness.com\",\n  \"contrasena\": \"password123\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Login Instructor",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "const res = pm.response.json();",
+                "if (res.token) pm.collectionVariables.set('token', res.token);"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/login", "host": ["{{base_url}}"], "path": ["login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo_electronico\": \"maria.paz@wellness.com\",\n  \"contrasena\": \"password123\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Login Cliente",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "const res = pm.response.json();",
+                "if (res.token) pm.collectionVariables.set('token', res.token);"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/login", "host": ["{{base_url}}"], "path": ["login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo_electronico\": \"ana.torres@email.com\",\n  \"contrasena\": \"password123\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Me (perfil autenticado)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/me", "host": ["{{base_url}}"], "path": ["me"] }
+          }
+        },
+
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/logout", "host": ["{{base_url}}"], "path": ["logout"] }
+          }
+        }
+
+      ]
+    },
+
+    {
+      "name": "📂 Categorías",
+      "item": [
+
+        {
+          "name": "Listar todas",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/categorias",
+              "host": ["{{base_url}}"], "path": ["categorias"]
+            }
+          }
+        },
+
+        {
+          "name": "Listar — filtro activas",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/categorias?estado=activo",
+              "host": ["{{base_url}}"], "path": ["categorias"],
+              "query": [{ "key": "estado", "value": "activo" }]
+            }
+          }
+        },
+
+        {
+          "name": "Listar — filtro tipo servicio",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/categorias?tipo=servicio",
+              "host": ["{{base_url}}"], "path": ["categorias"],
+              "query": [{ "key": "tipo", "value": "servicio" }]
+            }
+          }
+        },
+
+        {
+          "name": "Ver una categoría",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/categorias/1", "host": ["{{base_url}}"], "path": ["categorias", "1"] }
+          }
+        },
+
+        {
+          "name": "Crear categoría",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/categorias", "host": ["{{base_url}}"], "path": ["categorias"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Bienestar Mental\",\n  \"descripcion\": \"Terapias y actividades para la salud mental y emocional.\",\n  \"tipo\": \"ambos\",\n  \"estado\": \"activo\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Actualizar categoría",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/categorias/1", "host": ["{{base_url}}"], "path": ["categorias", "1"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Yoga & Meditación Avanzada\",\n  \"descripcion\": \"Descripción actualizada.\",\n  \"tipo\": \"servicio\",\n  \"estado\": \"activo\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Eliminar categoría",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/categorias/1", "host": ["{{base_url}}"], "path": ["categorias", "1"] }
+          }
+        }
+
+      ]
+    },
+
+    {
+      "name": "📦 Items (Productos & Servicios)",
+      "item": [
+
+        {
+          "name": "Listar todos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/items", "host": ["{{base_url}}"], "path": ["items"] }
+          }
+        },
+
+        {
+          "name": "Listar — solo activos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/items?estado=activo",
+              "host": ["{{base_url}}"], "path": ["items"],
+              "query": [{ "key": "estado", "value": "activo" }]
+            }
+          }
+        },
+
+        {
+          "name": "Listar — solo productos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/items?tipo=producto&estado=activo",
+              "host": ["{{base_url}}"], "path": ["items"],
+              "query": [
+                { "key": "tipo",   "value": "producto" },
+                { "key": "estado", "value": "activo" }
+              ]
+            }
+          }
+        },
+
+        {
+          "name": "Listar — solo servicios",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/items?tipo=servicio&estado=activo",
+              "host": ["{{base_url}}"], "path": ["items"],
+              "query": [
+                { "key": "tipo",   "value": "servicio" },
+                { "key": "estado", "value": "activo" }
+              ]
+            }
+          }
+        },
+
+        {
+          "name": "Listar — buscar por nombre",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/items?search=yoga",
+              "host": ["{{base_url}}"], "path": ["items"],
+              "query": [{ "key": "search", "value": "yoga" }]
+            }
+          }
+        },
+
+        {
+          "name": "Listar — filtrar por categoría",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/items?id_categoria=1",
+              "host": ["{{base_url}}"], "path": ["items"],
+              "query": [{ "key": "id_categoria", "value": "1" }]
+            }
+          }
+        },
+
+        {
+          "name": "Ver un item",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/items/1", "host": ["{{base_url}}"], "path": ["items", "1"] }
+          }
+        },
+
+        {
+          "name": "Crear — Producto",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/items", "host": ["{{base_url}}"], "path": ["items"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Aceite de Coco Orgánico\",\n  \"descripcion\": \"Aceite de coco virgen prensado en frío, 500ml. Ideal para cocina y cuidado personal.\",\n  \"precio\": 14.50,\n  \"tipo\": \"producto\",\n  \"estado\": \"activo\",\n  \"id_categoria\": 5,\n  \"marca\": \"NaturaCoco\",\n  \"stock_disponible\": 30,\n  \"fecha_elaboracion\": \"2025-12-01\",\n  \"fecha_caducidad\": \"2027-12-01\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Crear — Servicio (Retiro)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/items", "host": ["{{base_url}}"], "path": ["items"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Retiro de Desintoxicación Digital\",\n  \"descripcion\": \"Un fin de semana sin pantallas, reconectando con la naturaleza y contigo mismo.\",\n  \"precio\": 195.00,\n  \"tipo\": \"servicio\",\n  \"estado\": \"activo\",\n  \"id_categoria\": 2,\n  \"tipo_servicio\": \"retiro\",\n  \"fecha_inicio\": \"2026-04-10 15:00:00\",\n  \"fecha_fin\": \"2026-04-12 12:00:00\",\n  \"lugar\": \"Mindo, Pichincha\",\n  \"cupos_totales\": 15,\n  \"cupos_disponibles\": 15,\n  \"nivel_dificultad\": \"principiante\",\n  \"itinerario\": \"Viernes: Llegada y bienvenida\\nSábado: Actividades en naturaleza\\nDomingo: Integración y cierre\",\n  \"politicas_cancelacion\": \"Reembolso 100% hasta 7 días antes.\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Actualizar item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/items/1", "host": ["{{base_url}}"], "path": ["items", "1"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nombre actualizado\",\n  \"descripcion\": \"Descripción actualizada del item.\",\n  \"precio\": 299.00,\n  \"tipo\": \"servicio\",\n  \"estado\": \"activo\",\n  \"id_categoria\": 1\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Eliminar item",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/items/1", "host": ["{{base_url}}"], "path": ["items", "1"] }
+          }
+        }
+
+      ]
+    },
+
+    {
+      "name": "👥 Usuarios",
+      "item": [
+
+        {
+          "name": "Listar todos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/usuarios", "host": ["{{base_url}}"], "path": ["usuarios"] }
+          }
+        },
+
+        {
+          "name": "Listar — solo clientes",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/usuarios?rol=cliente",
+              "host": ["{{base_url}}"], "path": ["usuarios"],
+              "query": [{ "key": "rol", "value": "cliente" }]
+            }
+          }
+        },
+
+        {
+          "name": "Listar — solo instructores",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/usuarios?rol=instructor",
+              "host": ["{{base_url}}"], "path": ["usuarios"],
+              "query": [{ "key": "rol", "value": "instructor" }]
+            }
+          }
+        },
+
+        {
+          "name": "Listar — buscar por nombre",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/usuarios?search=maria",
+              "host": ["{{base_url}}"], "path": ["usuarios"],
+              "query": [{ "key": "search", "value": "maria" }]
+            }
+          }
+        },
+
+        {
+          "name": "Listar — solo activos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/usuarios?estado_cuenta=activo",
+              "host": ["{{base_url}}"], "path": ["usuarios"],
+              "query": [{ "key": "estado_cuenta", "value": "activo" }]
+            }
+          }
+        },
+
+        {
+          "name": "Ver un usuario",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/usuarios/1", "host": ["{{base_url}}"], "path": ["usuarios", "1"] }
+          }
+        },
+
+        {
+          "name": "Crear — Cliente",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/usuarios", "host": ["{{base_url}}"], "path": ["usuarios"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre_completo\": \"Laura Mejía\",\n  \"correo_electronico\": \"laura.mejia@email.com\",\n  \"contrasena\": \"password123\",\n  \"telefono\": \"+593 98 777 8888\",\n  \"rol\": \"cliente\",\n  \"ciudad\": \"Quito\",\n  \"direccion\": \"Av. Shyris 1234\",\n  \"preferencias\": \"Yoga, Meditación\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Crear — Instructor",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/usuarios", "host": ["{{base_url}}"], "path": ["usuarios"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre_completo\": \"Pablo Estrella\",\n  \"correo_electronico\": \"pablo.estrella@wellness.com\",\n  \"contrasena\": \"password123\",\n  \"telefono\": \"+593 98 555 6677\",\n  \"rol\": \"instructor\",\n  \"especialidad\": \"Pilates y Movilidad\",\n  \"descripcion_perfil\": \"Instructor de pilates con 6 años de experiencia y certificación internacional.\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Crear — Administrador",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/usuarios", "host": ["{{base_url}}"], "path": ["usuarios"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre_completo\": \"Admin Secundario\",\n  \"correo_electronico\": \"admin2@wellness.com\",\n  \"contrasena\": \"password123\",\n  \"telefono\": \"+593 99 000 0002\",\n  \"rol\": \"administrador\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Actualizar usuario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/usuarios/2", "host": ["{{base_url}}"], "path": ["usuarios", "2"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre_completo\": \"María Paz Villalba Actualizada\",\n  \"telefono\": \"+593 98 111 9999\",\n  \"estado_cuenta\": \"activo\",\n  \"especialidad\": \"Yoga Hatha, Yin Yoga y Meditación\",\n  \"descripcion_perfil\": \"Perfil actualizado con nueva especialidad.\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Eliminar usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/usuarios/10", "host": ["{{base_url}}"], "path": ["usuarios", "10"] }
+          }
+        }
+
+      ]
+    },
+
+    {
+      "name": "📝 Contenido / Blog",
+      "item": [
+
+        {
+          "name": "Listar todo",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/contenido", "host": ["{{base_url}}"], "path": ["contenido"] }
+          }
+        },
+
+        {
+          "name": "Listar — solo artículos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/contenido?tipo_contenido=articulo",
+              "host": ["{{base_url}}"], "path": ["contenido"],
+              "query": [{ "key": "tipo_contenido", "value": "articulo" }]
+            }
+          }
+        },
+
+        {
+          "name": "Listar — solo noticias",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/contenido?tipo_contenido=noticia",
+              "host": ["{{base_url}}"], "path": ["contenido"],
+              "query": [{ "key": "tipo_contenido", "value": "noticia" }]
+            }
+          }
+        },
+
+        {
+          "name": "Listar — solo videos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/contenido?tipo_contenido=video",
+              "host": ["{{base_url}}"], "path": ["contenido"],
+              "query": [{ "key": "tipo_contenido", "value": "video" }]
+            }
+          }
+        },
+
+        {
+          "name": "Listar — buscar por título",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/contenido?search=meditacion",
+              "host": ["{{base_url}}"], "path": ["contenido"],
+              "query": [{ "key": "search", "value": "meditacion" }]
+            }
+          }
+        },
+
+        {
+          "name": "Ver un contenido",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/contenido/1", "host": ["{{base_url}}"], "path": ["contenido", "1"] }
+          }
+        },
+
+        {
+          "name": "Crear artículo",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/contenido", "host": ["{{base_url}}"], "path": ["contenido"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Cómo Crear una Rutina Matutina de Bienestar\",\n  \"cuerpo\": \"Una rutina matutina bien diseñada puede transformar completamente tu día. Aquí te compartimos los elementos clave que no pueden faltar: meditación, movimiento, hidratación y nutrición consciente.\",\n  \"tipo_contenido\": \"articulo\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Crear noticia",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/contenido", "host": ["{{base_url}}"], "path": ["contenido"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Wellness abre su segunda sede en Guayaquil\",\n  \"cuerpo\": \"Nos complace anunciar la apertura de nuestra segunda sede en la ciudad de Guayaquil. A partir del 1 de mayo estaremos disponibles para la comunidad costera con todos nuestros servicios.\",\n  \"tipo_contenido\": \"noticia\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Crear anuncio",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/contenido", "host": ["{{base_url}}"], "path": ["contenido"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"20% de descuento en todos los retiros de abril\",\n  \"cuerpo\": \"Durante el mes de abril celebramos el Día de la Tierra con un 20% de descuento en todos nuestros retiros. Usa el código TIERRA2026 al momento de tu inscripción.\",\n  \"tipo_contenido\": \"anuncio\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Actualizar contenido",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/contenido/1", "host": ["{{base_url}}"], "path": ["contenido", "1"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Título actualizado\",\n  \"cuerpo\": \"Contenido del artículo actualizado con nueva información relevante para nuestra comunidad.\",\n  \"tipo_contenido\": \"articulo\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Eliminar contenido",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/contenido/1", "host": ["{{base_url}}"], "path": ["contenido", "1"] }
+          }
+        }
+
+      ]
+    },
+
+    {
+      "name": "📊 Admin Stats",
+      "item": [
+
+        {
+          "name": "Dashboard — estadísticas generales",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/admin/stats", "host": ["{{base_url}}"], "path": ["admin", "stats"] }
+          }
+        }
+
+      ]
+    },
+
+    {
+      "name": "🔴 Errores — casos límite",
+      "item": [
+
+        {
+          "name": "Login — credenciales incorrectas",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/login", "host": ["{{base_url}}"], "path": ["login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo_electronico\": \"noexiste@email.com\",\n  \"contrasena\": \"wrongpassword\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Sin token — acceso denegado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/me", "host": ["{{base_url}}"], "path": ["me"] }
+          }
+        },
+
+        {
+          "name": "Crear item — campos faltantes",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/items", "host": ["{{base_url}}"], "path": ["items"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Item sin precio ni tipo\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Ver item — ID inexistente",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/items/99999", "host": ["{{base_url}}"], "path": ["items", "99999"] }
+          }
+        },
+
+        {
+          "name": "Register — email duplicado",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/register", "host": ["{{base_url}}"], "path": ["register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre_completo\": \"Otro Admin\",\n  \"correo_electronico\": \"admin@wellness.com\",\n  \"contrasena\": \"password123\",\n  \"contrasena_confirmation\": \"password123\"\n}"
+            }
+          }
+        },
+
+        {
+          "name": "Crear usuario — rol inválido",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/usuarios", "host": ["{{base_url}}"], "path": ["usuarios"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre_completo\": \"Usuario Roto\",\n  \"correo_electronico\": \"roto@test.com\",\n  \"contrasena\": \"password123\",\n  \"rol\": \"superheroe\"\n}"
+            }
+          }
+        }
+
+      ]
+    }
+
+  ]
+}

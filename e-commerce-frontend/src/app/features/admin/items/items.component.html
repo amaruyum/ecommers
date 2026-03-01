@@ -1,0 +1,336 @@
+<div class="admin-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>Gestión de Items</h1>
+      <p>Administra productos y servicios del catálogo</p>
+    </div>
+    <button class="btn-primary" (click)="openCreate()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+           fill="none" stroke="white" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Nuevo Item
+    </button>
+  </div>
+
+  <!-- Mensajes -->
+  @if (successMsg()) {
+    <div class="alert alert-success">✓ {{ successMsg() }}</div>
+  }
+  @if (errorMsg() && !showModal()) {
+    <div class="alert alert-error">{{ errorMsg() }}</div>
+  }
+
+  <!-- Filtros -->
+  <div class="filters-bar">
+    <div class="search-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" placeholder="Buscar item..." (input)="onSearch($event)"/>
+    </div>
+    <select (change)="onFilterTipo($event)">
+      <option value="">Todos los tipos</option>
+      <option value="producto">Producto</option>
+      <option value="servicio">Servicio</option>
+    </select>
+    <select (change)="onFilterCat($event)">
+      <option value="">Todas las categorías</option>
+      @for (cat of categorias(); track cat.id_categoria) {
+        <option [value]="cat.id_categoria">{{ cat.nombre }}</option>
+      }
+    </select>
+    <select (change)="onFilterEstado($event)">
+      <option value="">Todos los estados</option>
+      <option value="activo">Activo</option>
+      <option value="inactivo">Inactivo</option>
+      <option value="agotado">Agotado</option>
+    </select>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-wrap">
+    @if (loading()) {
+      <div class="loading"><span class="spinner-dark"></span> Cargando...</div>
+    } @else if (items().length === 0) {
+      <div class="empty">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+             fill="none" stroke="#C8BFB0" stroke-width="1.5">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        </svg>
+        <p>No hay items. ¡Crea el primero!</p>
+      </div>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Tipo</th>
+            <th>Precio</th>
+            <th>Stock / Cupos</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items(); track item.id_item) {
+            <tr>
+              <td class="td-id">{{ item.id_item }}</td>
+              <td class="td-nombre">{{ item.nombre }}</td>
+              <td class="td-muted">{{ item.categoria?.nombre || '—' }}</td>
+              <td>
+                <span class="badge-tipo" [class]="'tipo-' + item.tipo">{{ item.tipo }}</span>
+              </td>
+              <td class="td-precio">${{ item.precio | number:'1.2-2' }}</td>
+              <td class="td-muted">
+                @if (item.tipo === 'producto') {
+                  {{ item.producto?.stock_disponible ?? 0 }} uds
+                } @else {
+                  {{ item.servicio?.cupos_disponibles ?? 0 }} / {{ item.servicio?.cupos_totales ?? 0 }}
+                }
+              </td>
+              <td>
+                <span class="badge-estado" [class]="'estado-' + item.estado">{{ item.estado }}</span>
+              </td>
+              <td class="td-actions">
+                <button class="btn-edit" (click)="openEdit(item)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                       fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                  Editar
+                </button>
+                <button class="btn-delete" (click)="confirmDelete(item)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                       fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                    <path d="M10 11v6"/><path d="M14 11v6"/>
+                  </svg>
+                  Eliminar
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>
+
+<!-- ── Modal ──────────────────────────────────────────────── -->
+@if (showModal()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal modal-lg" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <h2>{{ editingId() ? 'Editar Item' : 'Nuevo Item' }}</h2>
+        <button class="modal-close" (click)="closeModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      @if (errorMsg()) {
+        <div class="alert alert-error" style="margin-bottom:16px">{{ errorMsg() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+        <!-- Tipo selector (solo en creación) -->
+        @if (!editingId()) {
+          <div class="tipo-selector">
+            <button type="button" class="tipo-btn"
+                    [class.active]="esProducto"
+                    (click)="form.get('tipo')?.setValue('producto')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              </svg>
+              Producto
+            </button>
+            <button type="button" class="tipo-btn"
+                    [class.active]="esServicio"
+                    (click)="form.get('tipo')?.setValue('servicio')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
+              Servicio / Retiro
+            </button>
+          </div>
+        }
+
+        <div class="form-section">
+          <h3 class="section-label">Información General</h3>
+          <div class="field-row">
+            <div class="field">
+              <label>Nombre <span class="req">*</span></label>
+              <input type="text" formControlName="nombre" placeholder="Nombre del item"
+                     [class.invalid]="nombre?.invalid && nombre?.touched"/>
+              @if (nombre?.invalid && nombre?.touched) {
+                <span class="field-error">El nombre es obligatorio</span>
+              }
+            </div>
+            <div class="field">
+              <label>Categoría <span class="req">*</span></label>
+              <select formControlName="id_categoria" [class.invalid]="id_categoria?.invalid && id_categoria?.touched">
+                <option value="">Selecciona categoría</option>
+                @for (cat of categorias(); track cat.id_categoria) {
+                  <option [value]="cat.id_categoria">{{ cat.nombre }}</option>
+                }
+              </select>
+              @if (id_categoria?.invalid && id_categoria?.touched) {
+                <span class="field-error">Selecciona una categoría</span>
+              }
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Descripción</label>
+            <textarea formControlName="descripcion" rows="3" placeholder="Describe el item..."></textarea>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label>Precio (USD) <span class="req">*</span></label>
+              <input type="number" formControlName="precio" placeholder="0.00" min="0" step="0.01"
+                     [class.invalid]="precio?.invalid && precio?.touched"/>
+              @if (precio?.invalid && precio?.touched) {
+                <span class="field-error">Ingresa un precio válido</span>
+              }
+            </div>
+            <div class="field">
+              <label>Estado <span class="req">*</span></label>
+              <select formControlName="estado">
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+                <option value="agotado">Agotado</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campos específicos PRODUCTO -->
+        @if (esProducto) {
+          <div class="form-section">
+            <h3 class="section-label section-producto">Detalles del Producto</h3>
+            <div class="field-row">
+              <div class="field">
+                <label>Marca</label>
+                <input type="text" formControlName="marca" placeholder="Ej: Manduka"/>
+              </div>
+              <div class="field">
+                <label>Stock Disponible</label>
+                <input type="number" formControlName="stock_disponible" placeholder="0" min="0"/>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Fecha de Elaboración</label>
+                <input type="date" formControlName="fecha_elaboracion"/>
+              </div>
+              <div class="field">
+                <label>Fecha de Caducidad</label>
+                <input type="date" formControlName="fecha_caducidad"/>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Campos específicos SERVICIO -->
+        @if (esServicio) {
+          <div class="form-section">
+            <h3 class="section-label section-servicio">Detalles del Servicio / Retiro</h3>
+            <div class="field-row">
+              <div class="field">
+                <label>Tipo de Servicio</label>
+                <select formControlName="tipo_servicio">
+                  <option value="">Selecciona...</option>
+                  <option value="retiro">Retiro</option>
+                  <option value="capacitacion">Capacitación</option>
+                  <option value="taller">Taller</option>
+                  <option value="clase">Clase</option>
+                  <option value="evento">Evento</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Lugar</label>
+                <input type="text" formControlName="lugar" placeholder="Ej: Mindo, Ecuador"/>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Fecha de Inicio</label>
+                <input type="datetime-local" formControlName="fecha_inicio"/>
+              </div>
+              <div class="field">
+                <label>Fecha de Fin</label>
+                <input type="datetime-local" formControlName="fecha_fin"/>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Cupos Totales</label>
+                <input type="number" formControlName="cupos_totales" placeholder="0" min="1"/>
+              </div>
+              <div class="field">
+                <label>Cupos Disponibles</label>
+                <input type="number" formControlName="cupos_disponibles" placeholder="0" min="0"/>
+              </div>
+            </div>
+            <div class="field">
+              <label>Itinerario</label>
+              <textarea formControlName="itinerario" rows="3"
+                        placeholder="Describe el itinerario del evento..."></textarea>
+            </div>
+            <div class="field">
+              <label>Políticas de Cancelación</label>
+              <textarea formControlName="politicas_cancelacion" rows="2"
+                        placeholder="Describe las políticas de cancelación..."></textarea>
+            </div>
+          </div>
+        }
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeModal()">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="saving()">
+            @if (saving()) { <span class="spinner-sm"></span> Guardando... }
+            @else { {{ editingId() ? 'Actualizar' : 'Crear Item' }} }
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Confirm Delete -->
+@if (showConfirm()) {
+  <div class="modal-overlay" (click)="cancelDelete()">
+    <div class="modal modal-sm" (click)="$event.stopPropagation()">
+      <div class="confirm-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+             fill="none" stroke="#D64545" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <h3>¿Eliminar item?</h3>
+      <p>Vas a eliminar <strong>{{ deletingNombre() }}</strong>. Esta acción no se puede deshacer.</p>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cancelDelete()">Cancelar</button>
+        <button class="btn-danger" (click)="doDelete()">Sí, eliminar</button>
+      </div>
+    </div>
+  </div>
+}

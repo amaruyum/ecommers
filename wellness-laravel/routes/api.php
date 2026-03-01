@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\UsuarioClienteController;
 use App\Http\Controllers\Api\UsuarioController;
 use App\Http\Controllers\Api\UsuarioInstructorController;
 use App\Http\Controllers\Api\UsuarioRolController;
+use App\Http\Controllers\Api\StatsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,8 +41,24 @@ Route::post('login',    [AuthController::class, 'login']);
 
 // ─── AUTH (protegidas con Sanctum) ────────────────────────────────────────
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('logout', [AuthController::class, 'logout']);
-    Route::get('me',      [AuthController::class, 'me']);
+    // Auth
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/me',      [AuthController::class, 'me']);
+    // Stast
+    Route::get('/admin/stats', [StatsController::class, 'dashboard']);
+
+    // Categorías
+    Route::apiResource('categorias', CategoriaController::class)
+         ->parameters(['categorias' => 'id']);
+    // Items
+    Route::apiResource('items',      ItemController::class)
+         ->parameters(['items' => 'id']);
+    // Usuarios
+    Route::apiResource('usuarios',   UsuarioController::class)
+         ->parameters(['usuarios' => 'id']);
+    // Contenido
+    Route::apiResource('contenido',  ContenidoController::class)
+         ->parameters(['contenido' => 'id']);
 });
 
 // ─── USUARIOS Y ROLES ─────────────────────────────────────────────────────
